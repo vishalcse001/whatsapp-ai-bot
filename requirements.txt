@@ -3,7 +3,7 @@ uvicorn
 requests
 python-dotenv
 langchain
-langchain-google-genai
+langchain-google-genai==2.0.11
 langchain-pinecone==0.1.3
 langchain-community
 langchain-text-splitters
