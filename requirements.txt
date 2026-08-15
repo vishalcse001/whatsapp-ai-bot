@@ -4,8 +4,8 @@ requests
 python-dotenv
 langchain
 langchain-google-genai
-langchain-pinecone
+langchain-pinecone==0.1.3
 langchain-community
 langchain-text-splitters
-pinecone-client
+pinecone-client==3.2.2
 pypdf
