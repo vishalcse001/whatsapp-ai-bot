@@ -52,7 +52,7 @@ if INDEX_NAME not in existing_indexes:
 # 5. Chunks ko embeddings (numbers) me convert karke Pinecone me save karo
 print("Step 4: Chunks ko embeddings banake Pinecone me save kar rahe hain...")
 embeddings = GoogleGenerativeAIEmbeddings(
-    model="gemini-embedding-001",
+    model="models/gemini-embedding-001",
     google_api_key=GEMINI_API_KEY,
     output_dimensionality=768
 )

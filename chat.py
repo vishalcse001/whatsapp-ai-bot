@@ -24,7 +24,7 @@ INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 # (dono files me SAME embedding model hona zaroori hai, warna
 # matching sahi se kaam nahi karegi)
 embeddings = GoogleGenerativeAIEmbeddings(
-    model="gemini-embedding-001",
+    model="models/gemini-embedding-001",
     google_api_key=GEMINI_API_KEY,
     output_dimensionality=768
 )
