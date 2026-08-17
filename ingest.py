@@ -22,7 +22,7 @@ INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 
 # Load and parse the source document
 print("Step 1: Loading PDF...")
-loader = PyPDFLoader("brochure.pdf")
+loader = PyPDFLoader("restaurant_brochure.pdf")
 documents = loader.load()
 print(f"Loaded {len(documents)} page(s).")
 
