@@ -58,6 +58,34 @@ Answer:"""
     return response.content
 
 
+def get_welcome_message() -> str:
+    """
+    Builds a short, friendly welcome message based on the loaded document's
+    own content (business name, what it offers), so the greeting response
+    automatically matches whichever PDF has been ingested - no hardcoding
+    needed when the source document changes.
+    """
+    # A fixed query aimed at pulling the business's intro/about section,
+    # regardless of what the user actually typed (e.g. "hi").
+    intro_docs = retriever.invoke("business name, about us, what this business offers")
+    context = "\n\n".join(doc.page_content for doc in intro_docs)
+
+    prompt = f"""Based on the brochure content below, write a short, friendly WhatsApp
+greeting (2-3 sentences) that:
+- Welcomes the customer
+- Mentions the business name
+- Briefly says what you can help them with (based on the document)
+Keep it warm and concise, suitable for a WhatsApp first message.
+
+Brochure content:
+{context}
+
+Greeting:"""
+
+    response = llm.invoke(prompt)
+    return response.content
+
+
 if __name__ == "__main__":
     print("AI Bot ready. Type 'exit' to quit.\n")
     while True:

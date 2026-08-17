@@ -11,7 +11,7 @@ import requests
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 
-from chat import get_ai_response
+from chat import get_ai_response, get_welcome_message
 
 load_dotenv()
 
@@ -21,15 +21,9 @@ META_PHONE_NUMBER_ID = os.getenv("META_PHONE_NUMBER_ID")
 # Must match the verify token configured in the Meta app dashboard
 VERIFY_TOKEN = "mera_secret_token_123"
 
-# Common greetings that get a fixed welcome reply instead of going through
-# the RAG pipeline (greetings don't have a meaningful match in the document).
+# Common greetings that trigger a dynamic welcome message instead of
+# going through the regular RAG pipeline.
 GREETINGS = {"hi", "hello", "hey", "namaste", "hii", "hlo", "helo"}
-
-WELCOME_MESSAGE = (
-    "Hello! Welcome to XYZ Coaching Institute. 👋\n\n"
-    "I can help you with information about our courses, fees, batch timings, "
-    "scholarships, and admissions. What would you like to know?"
-)
 
 app = FastAPI()
 
@@ -73,10 +67,10 @@ async def receive_message(request: Request):
 
             print(f"From {sender_number}: {user_text}")
 
-            # Handle simple greetings with a fixed welcome message,
-            # skipping the RAG pipeline for these low-value queries.
+            # Greetings get a dynamically generated welcome message based on
+            # the loaded document's own content, rather than a fixed reply.
             if user_text.strip().lower() in GREETINGS:
-                ai_answer = WELCOME_MESSAGE
+                ai_answer = get_welcome_message()
             else:
                 ai_answer = get_ai_response(user_text)
 
