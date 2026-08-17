@@ -17,6 +17,7 @@ load_dotenv()
 
 META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN")
 META_PHONE_NUMBER_ID = os.getenv("META_PHONE_NUMBER_ID")
+GOOGLE_SHEET_WEBHOOK_URL = os.getenv("GOOGLE_SHEET_WEBHOOK_URL")
 
 # Must match the verify token configured in the Meta app dashboard
 VERIFY_TOKEN = "mera_secret_token_123"
@@ -65,7 +66,17 @@ async def receive_message(request: Request):
             sender_number = message_data["from"]
             user_text = message_data["text"]["body"]
 
+            # Extract the sender's display name, if WhatsApp provided one
+            sender_name = "Unknown"
+            try:
+                sender_name = value["contacts"][0]["profile"]["name"]
+            except (KeyError, IndexError):
+                pass
+
             print(f"From {sender_number}: {user_text}")
+
+            # Log every inbound message as a lead in the Google Sheet
+            log_lead(sender_name, sender_number, user_text)
 
             # Greetings get a dynamically generated welcome message based on
             # the loaded document's own content, rather than a fixed reply.
@@ -107,6 +118,27 @@ def send_whatsapp_message(to_number: str, message_text: str):
         print("Message sent successfully.")
     else:
         print(f"Failed to send message: {response.text}")
+
+
+def log_lead(name: str, phone: str, message: str):
+    """
+    Sends the customer's name, phone number, and message to the Google Sheet
+    (via the Apps Script web app) so every inbound conversation is captured
+    as a lead. Failures here are logged but never block the chat reply.
+    """
+    if not GOOGLE_SHEET_WEBHOOK_URL:
+        return
+
+    payload = {"name": name, "phone": phone, "message": message}
+
+    try:
+        response = requests.post(GOOGLE_SHEET_WEBHOOK_URL, json=payload, timeout=10)
+        if response.status_code == 200:
+            print("Lead logged to Google Sheet.")
+        else:
+            print(f"Failed to log lead: {response.text}")
+    except requests.RequestException as e:
+        print(f"Error logging lead: {e}")
 
 
 @app.get("/")
