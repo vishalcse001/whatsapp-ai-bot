@@ -19,6 +19,10 @@ META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN")
 META_PHONE_NUMBER_ID = os.getenv("META_PHONE_NUMBER_ID")
 GOOGLE_SHEET_WEBHOOK_URL = os.getenv("GOOGLE_SHEET_WEBHOOK_URL")
 
+# Identifies which business this bot instance is currently serving,
+# so leads in the shared sheet can be told apart during testing.
+BUSINESS_NAME = os.getenv("BUSINESS_NAME", "Unknown Business")
+
 # Must match the verify token configured in the Meta app dashboard
 VERIFY_TOKEN = "mera_secret_token_123"
 
@@ -132,7 +136,7 @@ def log_lead(name: str, phone: str, message: str):
     payload = {"name": name, "phone": phone, "message": message}
 
     try:
-        response = requests.post(GOOGLE_SHEET_WEBHOOK_URL, json=payload, timeout=10)
+        response = requests.post(GOOGLE_SHEET_WEBHOOK_URL, json=payload, timeout=20)
         if response.status_code == 200:
             print("Lead logged to Google Sheet.")
         else:
